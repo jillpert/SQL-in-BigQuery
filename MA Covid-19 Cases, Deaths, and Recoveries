@@ -1,0 +1,36 @@
+##Review and check for inconsistencies in data
+
+SELECT * 
+FROM `bigquery-public-data.covid19_jhu_csse.summary`
+WHERE country_region IS NULL
+
+##Query to filter table for only Massachusetts data
+
+SELECT date, province_state, country_region, confirmed, deaths, recovered
+FROM `bigquery-public-data.covid19_jhu_csse.summary`
+WHERE province_state = "Massachusetts"
+ORDER BY date
+
+##Combine multiple rows from duplicate dates and calculate a 
+##dailyrunning total for confirmed new cases, deaths, 
+##and recoveries over time
+
+SELECT date, province_state, SUM(confirmed) AS conf_cases, 
+SUM(deaths) AS conf_deaths, SUM(recovered) AS conf_recovered
+FROM `bigquery-public-data.covid19_jhu_csse.summary`
+WHERE province_state = "Massachusetts"
+GROUP BY date, province_state 
+ORDER BY date
+
+
+##Calculate the percentage of daily deaths and recoveries 
+##VS total cases
+
+SELECT date, province_state, SUM(confirmed) AS conf_cases, 
+SUM(deaths) AS conf_deaths, SUM(recovered) AS conf_recovered,
+SUM(deaths)/SUM(confirmed)*100 as percent_deaths,
+SUM(recovered)/SUM(confirmed)*100 as percent_recovered
+FROM `bigquery-public-data.covid19_jhu_csse.summary`
+WHERE province_state = "Massachusetts"
+GROUP BY date, province_state 
+ORDER BY date
